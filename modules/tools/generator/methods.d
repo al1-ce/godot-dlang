@@ -181,8 +181,8 @@ class GodotMethod {
         else
             ret ~= "GodotMethod";
         ret ~= "!(" ~ return_type.dType;
-        if (return_type.isSingleton)
-            ret ~= "Singleton";
+        // if (return_type.isSingleton)
+        //     ret ~= "Singleton";
         foreach (ai, const arg; arguments) {
             ret ~= ", " ~ arg.type.dType;
         }
@@ -284,8 +284,8 @@ class GodotMethod {
             // const in D is transitive, which means compiler should disallow modifying returned reference types
             ret ~= return_type.stripConst.dRef;
         }
-        if (return_type.isSingleton)
-            ret ~= "Singleton";
+        // if (return_type.isSingleton)
+        //     ret ~= "Singleton";
         ret ~= " ";
         // none of the types (Classes/Core/Primitive) are pointers in D
         // Classes are reference types; the others are passed by value.
@@ -421,8 +421,8 @@ class GodotMethod {
             }
 
             ret ~= callType() ~ "!(" ~ return_type.dType;
-            if (return_type.isSingleton)
-                ret ~= "Singleton";
+            // if (return_type.isSingleton)
+            //     ret ~= "Singleton";
             ret ~= ")(";
             if (parent.isBuiltinClass)
                 ret ~= "cast(GDExtensionPtrBuiltInMethod) ";

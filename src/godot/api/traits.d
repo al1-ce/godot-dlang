@@ -57,7 +57,7 @@ Determine if T is a class originally from the Godot Engine (but *not* a new D
 class registered to Godot).
 +/
 template isGodotBaseClass(T) {
-    static if (is(T == struct))
+    static if (is(T == class))
         enum bool isGodotBaseClass =
             hasUDA!(T, GodotBaseClass);
     else

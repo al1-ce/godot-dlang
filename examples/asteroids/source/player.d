@@ -6,7 +6,7 @@ import godot.input;
 import godot.inputevent;
 import godot.engine;
 
-class Player : GodotScript!Area3D {
+class Player : Area3D {
     alias owner this;
 
     enum float speed = 25; /// units per second

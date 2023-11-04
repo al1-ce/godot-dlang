@@ -171,11 +171,11 @@ final class GodotClass {
         string ret = "\tpackage(godot) __gshared bool _classBindingInitialized = false;\n";
         ret ~= "\tpackage(godot) static struct GDExtensionClassBinding {\n";
         ret ~= "\t\t__gshared:\n";
-        if (singleton) {
-            ret ~= "\t\tgodot_object _singleton;\n";
-            ret ~= "\t\timmutable string _singletonName = \"" ~ name.godotType.chompPrefix(
-                "_") ~ "\";\n";
-        }
+        // if (singleton) {
+        //     ret ~= "\t\tgodot_object _singleton;\n";
+        //     ret ~= "\t\timmutable string _singletonName = \"" ~ name.godotType.chompPrefix(
+        //         "_") ~ "\";\n";
+        // }
         foreach (const ct; constructors) {
             ret ~= ct.binding;
         }
@@ -285,12 +285,13 @@ public import godot.classdb;`;
         }
 
         string className = name.dType;
-        if (singleton)
-            className ~= "Singleton";
+        string inheritName = base_class !is null ? ": " ~ base_class.dType : "";
+        // if (singleton)
+        //     className ~= "Singleton";
         if (isBuiltinClass)
             className ~= "_Bind";
         ret ~= "/**\n" ~ ddoc ~ "\n*/\n";
-        ret ~= "@GodotBaseClass struct " ~ className ~ " {\n";
+        ret ~= "@GodotBaseClass class " ~ className ~ inheritName ~ " {\n";
         ret ~= "\tpackage(godot) enum string _GODOT_internal_name = \"" ~ name.godotType ~ "\";\n";
         ret ~= "\tpublic:\n";
         // way to much PITA, ignore for now
@@ -299,9 +300,10 @@ public import godot.classdb;`;
         // Pointer to Godot object, fake inheritance through alias this
         if (name.godotType != "Object" && name.godotType != "CoreConstants" && !isBuiltinClass) {
             ret ~= "\tunion { /** */ godot_object _godot_object; /** */ " ~ base_class.dType;
-            if (base_class && base_class.original && base_class.original.singleton)
-                ret ~= "Singleton";
-            ret ~= " _GODOT_base; }\n\talias _GODOT_base this;\n";
+            // if (base_class && base_class.original && base_class.original.singleton)
+            //     ret ~= "Singleton";
+            // ret ~= " _GODOT_base; }\n\talias _GODOT_base this;\n";
+            ret ~= " _GODOT_base; }\n\t";
             ret ~= "\talias BaseClasses = AliasSeq!(typeof(_GODOT_base), typeof(_GODOT_base).BaseClasses);\n";
         } else {
             ret ~= "\t" ~ name.asOpaqueType ~ "  _godot_object;\n";
@@ -310,7 +312,7 @@ public import godot.classdb;`;
 
         ret ~= bindingStruct;
 
-        if (!isBuiltinClass) {
+        if (className == "GodotObject") {
             // equality
             ret ~= "\t/// \n";
             ret ~= "\tpragma(inline, true) bool opEquals(in " ~ className ~ " other) const {\n";
@@ -334,7 +336,7 @@ public import godot.classdb;`;
             }
             // hash function
             ret ~= "\t/// \n";
-            ret ~= "\textern(D) size_t toHash() const nothrow @trusted { return cast(size_t)_godot_object.ptr; }\n";
+            ret ~= "\textern(D) override size_t toHash() const nothrow @trusted { return cast(size_t)_godot_object.ptr; }\n";
 
             ret ~= "\tmixin baseCasts;\n";
 
@@ -451,15 +453,15 @@ public import godot.classdb;`;
 
         ret ~= "}\n";
 
-        if (singleton) {
-            ret ~= "/// Returns: the " ~ className ~ "\n";
-            //ret ~= "@property @nogc nothrow pragma(inline, true)\n";
-            ret ~= "@property pragma(inline, true)\n";
-            ret ~= className ~ " " ~ name.dType ~ "() {\n";
-            ret ~= "\tcheckClassBinding!" ~ className ~ "();\n";
-            ret ~= "\treturn " ~ className ~ "(" ~ className ~ ".GDExtensionClassBinding._singleton);\n";
-            ret ~= "}\n";
-        }
+        // if (singleton) {
+        //     ret ~= "/// Returns: the " ~ className ~ "\n";
+        //     //ret ~= "@property @nogc nothrow pragma(inline, true)\n";
+        //     ret ~= "@property pragma(inline, true)\n";
+        //     ret ~= className ~ " " ~ name.dType ~ "() {\n";
+        //     ret ~= "\tcheckClassBinding!" ~ className ~ "();\n";
+        //     ret ~= "\treturn " ~ className ~ "(" ~ className ~ ".GDExtensionClassBinding._singleton);\n";
+        //     ret ~= "}\n";
+        // }
 
         return ret;
     }
